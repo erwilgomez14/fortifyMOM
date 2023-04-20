@@ -12,6 +12,7 @@
             min-height: calc(100vh - 140px) !important;
         }
     </style>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.4/dist/sweetalert2.min.css">
 @endsection
 
 @section('content')
@@ -37,7 +38,7 @@
                             $(".alert").alert();
                         </script>
                     @endif
-                    <form method="POST" action="{{ route('ordentrabajo.store') }}">
+                    <form id="formulario" method="POST" action="{{ route('ordentrabajo.store') }}">
                         @csrf
                         <h2 class="tittle"> Creacion de Orden de trabajo</h2>
 
@@ -66,6 +67,11 @@
                                     <option value="{{ $acueducto->id_acueducto }}">{{ $acueducto->nom_acu }}</option>
                                 @endforeach
                             </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="descrip_ot">Descripcion de la orden</label>
+                            <input type="text" name="descrip_ot" id="descrip_ot" class="form-control">
+
                         </div>
                         <div class="form-group">
                             <label for="id_sistema">Sistema</label>
@@ -104,21 +110,17 @@
                         </div>
                         <div class="form-group">
                             <label for="dias">Días:</label>
-                            <input type="number" class="form-control" id="dias" name="dias" min="1" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="hora">Hora:</label>
-                            <input type="time" name="hora" id="hora" class="form-control">
+                            <input type="number" class="form-control" id="dias" name="dias" min="1">
                         </div>
                         <div class="form-group">
                             <label for="fecha_inicio">Fecha Inicio</label>
-                            <input type="date" name="fecha_inicio" class="form-control" id="fecha_inicio"
+                            <input type="datetime-local" name="fecha_inicio" class="form-control" id="fecha_inicio"
                                 placeholder="id del acueducto"
                                 value="{{ old('fecha_inicio', $ordenTrabajo->fecha_inicio ?? '') }}">
 
                             <label for="fecha_final">Fecha Final</label>
                             <div>
-                            <input type="date" name="fecha_final" class="form-control" id="fecha_final"
+                            <input type="datetime-local" name="fecha_final" class="form-control" id="fecha_final"
                                 placeholder="id del acueducto"
                                 value="{{ old('fecha_final', $ordenTrabajo->fecha_final ?? '') }}">
                             </div>
@@ -138,20 +140,24 @@
 
                         <div class="form-group mt-3 bg-gradient-dark">
                             <label for="select-usuario">Seleccionar mano de obra:</label>
-                            <select id="select-usuario" class="custom-select" name="select-usuario">
+                            <select id="select-usuario" class="custom-select" >
                             @foreach ($usuarios as $usuario)
-                                    <option value="{{$usuario->id}}">{{$usuario->nombre}}</option>
+                                    <option value="{{$usuario->cedula}}">{{$usuario->nombre}}</option>
                             @endforeach
                             </select>
                             <button type="button" class="btn btn-dark mt-3" id="btn-agregar">Agregar</button>
 
                             <table class="table mt-3" id="tabla-opciones">
                                 <thead class="thead-dark">
+                                <h4 class="text-center"> Datos de la mano de obra</h4>
                                 <tr>
-                                    <th class="text-center">Datos de la mano de obra</th>
+                                    <th >Nombre </th>
+                                    <th >Cedula </th>
                                 </tr>
                                 </thead>
-                                <tbody></tbody>
+                                <tbody>
+
+                                </tbody>
                             </table>
                         </div>
 
@@ -161,7 +167,7 @@
                         </div>
                         <div class="form-group pt-2">
                             <a href="{{ route('acueductos.index') }}" class="btn btn-dark">Volver</a>
-                            <input class="btn btn-primary" type="submit" value="Guardar">
+                            <input class="btn btn-primary" {{--type="submit"--}} id="btn-guardar" value="Guardar">
                         </div>
                     </form>
 
@@ -176,6 +182,8 @@
 
 
 @section('scripts')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.4/dist/sweetalert2.min.js"></script>
+
     <script>
         const csrfToken = document.head.querySelector("[name=csrf-token][content]").content;
         document.getElementById('id_acueducto').addEventListener('change', (e) => {
@@ -220,8 +228,8 @@
             }).then(data => {
                 var opciones = "<option value=''>Seleecionar Equipo</option>";
                 for (let i in data.lista) {
-                    opciones += '<option value="' + data.lista[i].id_equipo + '" data-tipo="'+data.lista[i].id_tipo_eq+'">' + data.lista[i]
-                        .desc_equipo + '</option>';
+                    opciones += '<option value="' + data.lista[i].id_subsistema + '" data-tipo="'+data.lista[i].id_tipo_eq+'">' + data.lista[i]
+                        .nombre_subsistema + '</option>';
                 }
                 console.log(opciones);
                 document.getElementById("id_equipo").innerHTML = opciones;
@@ -295,22 +303,98 @@
                 // document.getElementById("listadotareas").innerHTML = listatareas;
             }).catch(error => console.error(error));
         })
+
+
         const tablaOpciones = document.getElementById('tabla-opciones').getElementsByTagName('tbody')[0];
         const btnAgregar = document.getElementById('btn-agregar');
         const selectUsuario = document.getElementById('select-usuario');
-        console.log(selectUsuario);
+        const btnGuardar = document.getElementById('btn-guardar');
+        let datos = [];
+        let form = document.getElementById('formulario');
 
         function agregarOpcion() {
             const tr = document.createElement('tr');
             const tdUsuario = document.createElement('td');
+            const tdUsuarioCedula = document.createElement('td');
             tdUsuario.textContent = selectUsuario.options[selectUsuario.selectedIndex].text;
+            tdUsuarioCedula.textContent = selectUsuario.options[selectUsuario.selectedIndex].value;
             tr.appendChild(tdUsuario);
+            tr.appendChild(tdUsuarioCedula);
             tablaOpciones.appendChild(tr);
+
+            const filas = tablaOpciones.getElementsByTagName('tr');
+            datos = Array.from(filas).map(fila => {
+                const celdas = fila.getElementsByTagName('td');
+                return {
+                    cedula: celdas[1].textContent,
+                    /*nombre: celdas[0].textContent*/
+                }
+            });
+            console.log(tablaOpciones)
+            console.log(datos);
+
+        }
+
+        function guardarOpcion(event){
+            event.preventDefault();
+            const id_acueducto = document.getElementById('id_acueducto').value;
+            const descrip_ot = document.getElementById('descrip_ot').value;
+            const id_sistema = document.getElementById('id_sistema').value;
+            const id_equipo = document.getElementById('id_equipo').value;
+            const id_tipo_orden = document.querySelector('input[name="id_tipo_orden"]:checked').value;
+            const id_prioridad = document.querySelector('input[name="id_prioridad"]:checked').value;
+            const dias = document.getElementById('dias').value;
+            //const hora = document.getElementById('hora').value;
+            const fecha_inicio = document.getElementById('fecha_inicio').value;
+            const fecha_final = document.getElementById('fecha_final').value;
+            const observacion = document.getElementById('observacion').value;
+            const odt = {
+                id_acueducto,
+                descrip_ot,
+                id_sistema,
+                id_equipo,
+                id_tipo_orden,
+                id_prioridad,
+                dias,
+               // hora,
+                fecha_inicio,
+                fecha_final,
+                observacion
+            };
+            console.log(odt);
+
+            console.log(form);
+            console.log(datos);
+            fetch('/mantenimiento/ordentrabajo', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    "X-CSRF-Token": csrfToken
+                },
+                body: JSON.stringify({ data: datos,
+                    odt})
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const odtNumber = data.odt.id_orden;
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: `Orden de trabajo creada satisfactoriamente. Número de orden: ${odtNumber}`,
+                        icon: 'success'
+                    }).then((result) => {
+                        // Redirigir a la ruta
+                        if (result.isConfirmed) {
+                        window.location.href = '{{route('ordentrabajo.index')}}';
+                    }
+                    });
+            })
+                .catch(error => console.error(error));
         }
 
 
+
         btnAgregar.addEventListener('click', agregarOpcion);
-        console.log(tablaOpciones);
+        btnGuardar.addEventListener('click', guardarOpcion);
         // const acueducto = document.getElementById('id_acueducto')
         // const sistema = document.getElementById('id_sistema')
 

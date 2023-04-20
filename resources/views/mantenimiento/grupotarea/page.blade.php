@@ -21,6 +21,7 @@
                         <tr>
                             <th scope="col">ID</th>
                             <th scope="col">Descripcion</th>
+                            <th scope="col">Tipo de equipo</th>
                             <th scope="col">Acciones</th>
                         </tr>
                     </thead>
@@ -30,6 +31,7 @@
                             <td>{{$grupotareas->id_tareas}}</td>
 
                             <td>{{$grupotareas->tarea}}</td>
+                            <td>{{$grupotareas->tipo_equipo}}</td>
                             <td>
                                 <a href="{{route('grupotareas.show', $grupotareas)}}"><i class="far fa-eye"></i><span class="icon-name"></span></a>
 

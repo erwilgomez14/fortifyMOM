@@ -9,10 +9,14 @@ use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\SistemaController;
 use \App\Http\Controllers\UbicacionPlantaController;
 use \App\Http\Controllers\OrdenTrabajoController;
+<<<<<<< HEAD
 use \App\Http\Controllers\HerramientasController;
 use \App\Http\Controllers\TareaController;
 
 
+=======
+use \App\Http\Controllers\MantenimientoPreventivoController;
+>>>>>>> 41fc68ff9c178bce05bbafd6245439bdf239844a
 
 /*
 |--------------------------------------------------------------------------
@@ -28,8 +32,12 @@ use \App\Http\Controllers\TareaController;
 Route::get('/', function () {
     return view('welcome');
 });
-Route::resource('panel', PanelController::class)
-->middleware('auth');
+Route::prefix('panel')->group(function () {
+    Route::resource('', PanelController::class);
+    Route::resource('mantenimientopreventivo', MantenimientoPreventivoController::class);
+    Route::get('/mantenimientopreventivo/hasOrden', [MantenimientoPreventivoController::class, 'hasOrden']);
+
+})->middleware('auth');
 Route::prefix('activos')->group(function () {
     Route::resource('acueductos', AcueductoController::class)->middleware('rol:gerente,super-usuario');
     Route::resource('equipos', EquipoController::class);
@@ -48,6 +56,7 @@ Route::prefix('mantenimiento')->group(function () {
     Route::post('/ordentrabajo/hasTareas', [OrdenTrabajoController::class, 'hasTareas']);
     Route::post('/ordentrabajo/hasSistema', [OrdenTrabajoController::class, 'hasSistema']);
     Route::post('/ordentrabajo/hasEquipo', [OrdenTrabajoController::class, 'hasEquipo']);
+    Route::post('/ordentrabajo/guardarmanoobra', [OrdenTrabajoController::class, 'guardarmanoobra']);
     Route::post('equipos', [OrdenTrabajoController::class, 'hasEquipo']);
 
    // Route::get('ordentrabajo/{acueducto}/acueducto', [OrdenTrabajoController::class, 'obtenersistemas']);

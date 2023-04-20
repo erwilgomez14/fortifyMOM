@@ -18,6 +18,13 @@ class OrdenTrabajo extends Model
     protected $primaryKey = 'id_orden';
     public $timestamps = false;
 
+    protected $fillable = [
+        'id_orden',
+        'id_acueducto',
+        'id_equipo',
+        'id_tipo_ot',
+        'id_sistema'
+    ];
 
     public function acueductos(): HasMany
     {
@@ -32,8 +39,13 @@ class OrdenTrabajo extends Model
     {
         return $this->BelongsTo(Sistema::class, 'id_sistema', 'id_sistema');
     }
-    public function prioridad(): HasOne
+    public function prioridad(): hasOne
     {
-        return $this->hasOne(Acueductos::class, 'id_acueducto', 'id_acueducto');
+        return $this->hasOne(PrioridadOrdenTrabajo::class, 'id_prioridad', 'id_prioridad');
+    }
+
+    public function obreros(): HasMany
+    {
+        return $this->HasMany(OdtUsuario::class, 'id_orden', 'id_orden');
     }
 }
