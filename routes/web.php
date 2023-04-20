@@ -9,14 +9,10 @@ use App\Http\Controllers\EquipoController;
 use App\Http\Controllers\SistemaController;
 use \App\Http\Controllers\UbicacionPlantaController;
 use \App\Http\Controllers\OrdenTrabajoController;
-<<<<<<< HEAD
 use \App\Http\Controllers\HerramientasController;
 use \App\Http\Controllers\TareaController;
 
 
-=======
-use \App\Http\Controllers\MantenimientoPreventivoController;
->>>>>>> 41fc68ff9c178bce05bbafd6245439bdf239844a
 
 /*
 |--------------------------------------------------------------------------
