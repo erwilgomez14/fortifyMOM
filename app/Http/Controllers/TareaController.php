@@ -2,17 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\UbicacionPlanta;
+use App\Models\Grupotarea;
 use Illuminate\Http\Request;
 
-class UbicacionPlantaController extends Controller
+class TareaController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        return view('mantenimiento.ubicacionplanta.page');
+        $grupotareas = Grupotarea::all();
+
+        //dd($grupotareas);
+        return view('mantenimiento.grupotarea.page', compact('grupotareas'));
+        
     }
 
     /**
@@ -20,7 +24,7 @@ class UbicacionPlantaController extends Controller
      */
     public function create()
     {
-
+        //
     }
 
     /**
@@ -34,7 +38,7 @@ class UbicacionPlantaController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(UbicacionPlanta $ubicacionPlanta)
+    public function show(string $id)
     {
         //
     }
@@ -42,7 +46,7 @@ class UbicacionPlantaController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(UbicacionPlanta $ubicacionPlanta)
+    public function edit(string $id)
     {
         //
     }
@@ -50,7 +54,7 @@ class UbicacionPlantaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, UbicacionPlanta $ubicacionPlanta)
+    public function update(Request $request, string $id)
     {
         //
     }
@@ -58,7 +62,7 @@ class UbicacionPlantaController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(UbicacionPlanta $ubicacionPlanta)
+    public function destroy(string $id)
     {
         //
     }

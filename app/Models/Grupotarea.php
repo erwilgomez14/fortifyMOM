@@ -5,15 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TipoEquipo extends Model
+class Grupotarea extends Model
 {
     use HasFactory;
-
-    use HasFactory;
-
-    protected $table = 'ope_tipo_eq';
-
-    protected $keyType = 'string';
-    protected $primaryKey = 'id_tipo_eq';
+    protected $table = 'tareas_equipos';
+    protected $primaryKey = 'id_tareas';
     public $timestamps = false;
 }
